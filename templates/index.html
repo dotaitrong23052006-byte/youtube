@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Tải video YouTube</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            min-height: 100vh;
+            margin: 0;
+            font-family: 'Segoe UI', sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            padding: 2.5rem;
+            width: 90%;
+            max-width: 500px;
+            text-align: center;
+            color: white;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .glass-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 24px rgba(0,0,0,0.2);
+        }
+
+        h1 {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 1.5rem;
+            color: #ffffff;
+        }
+
+        input[type="text"] {
+            border-radius: 12px;
+            padding: 0.75rem;
+            border: none;
+            outline: none;
+        }
+
+        .btn-primary {
+            background: #00c6ff;
+            background: linear-gradient(to right, #0072ff, #00c6ff);
+            border: none;
+            padding: 0.75rem;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(to right, #00c6ff, #0072ff);
+            transform: scale(1.02);
+        }
+
+        .btn-success {
+            background: linear-gradient(to right, #00b09b, #96c93d);
+            border: none;
+        }
+
+        .btn-secondary {
+            background-color: rgba(255, 255, 255, 0.2);
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background-color: rgba(255, 255, 255, 0.35);
+        }
+
+        .alert {
+            border-radius: 12px;
+        }
+
+        #spinner {
+            display: none;
+        }
+
+        #spinner p {
+            margin-top: 10px;
+            color: #f0f0f0;
+        }
+
+        .fade-in {
+            animation: fadeIn 1.5s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from {opacity: 0; transform: translateY(20px);}
+            to {opacity: 1; transform: translateY(0);}
+        }
+
+        .video-preview {
+            margin-top: 25px;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+        }
+
+        select.form-select {
+            border-radius: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="glass-card fade-in">
+        <h1><i class="fab fa-youtube text-danger"></i> Tải video YouTube</h1>
+
+        {% if error %}
+            <div class="alert alert-danger">{{ error }}</div>
+        {% endif %}
+
+        <form method="post" onsubmit="showSpinner()">
+            <div class="input-group mb-3">
+                <input type="text" id="url-input" class="form-control" name="url" placeholder="Dán liên kết YouTube vào đây..." required>
+                <button type="button" class="btn btn-secondary" onclick="pasteLink()">
+                    <i class="fas fa-paste"></i> Dán
+                </button>
+            </div>
+
+            <!-- Dropdown chọn định dạng -->
+            <div class="mb-3">
+                <select class="form-select" name="format" required>
+                    <option value="mp4" selected>MP4 (Video)</option>
+                    <option value="mp3">MP3 (Chỉ âm thanh)</option>
+                </select>
+            </div>
+
+            <button type="submit" class="btn btn-primary w-100">
+                <i class="fas fa-download"></i> Tải về
+            </button>
+        </form>
+
+        <div id="spinner" class="mt-3">
+            <div class="spinner-border text-light" role="status">
+                <span class="visually-hidden">Đang xử lý...</span>
+            </div>
+            <p>Đang tải video, vui lòng chờ...</p>
+        </div>
+
+        {% if video_id %}
+            <div class="video-preview ratio ratio-16x9 mt-4">
+                <iframe src="https://www.youtube.com/embed/{{ video_id }}" title="Xem trước video" allowfullscreen></iframe>
+            </div>
+        {% endif %}
+
+        {% if filename %}
+            <a href="{{ url_for('download', filename=filename) }}" class="btn btn-success mt-4">
+                <i class="fas fa-cloud-download-alt"></i> Bấm để tải xuống
+            </a>
+        {% endif %}
+    </div>
+
+    <script>
+        function showSpinner() {
+            document.getElementById('spinner').style.display = 'block';
+        }
+
+        function pasteLink() {
+            navigator.clipboard.readText()
+                .then(text => {
+                    document.getElementById("url-input").value = text;
+                })
+                .catch(err => {
+                    alert("Không thể truy cập clipboard. Vui lòng cho phép trình duyệt truy cập.");
+                });
+        }
+    </script>
+</body>
+</html>
